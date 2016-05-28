@@ -9,6 +9,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import au.com.reece.addressbook.fixture.ContactFixture;
+
 /**
  * Test the Contact class.
  *
@@ -107,7 +109,7 @@ public class ContactTest {
 	@Test
 	public void whenSameObjectAsParameterThenEqualsShouldReturnsTrue() {
 		// Given one contact object
-		contact = new Contact(TEST_NAME, TEST_PHONE_NUMBER);
+		contact = ContactFixture.getDefaultContact();
 		
 		//When equals method called.
 		boolean sameObject = contact.equals(contact);
@@ -119,7 +121,7 @@ public class ContactTest {
 	@Test
 	public void whenNullAsParameterThenEqualsShouldReturnsFalse() {
 		//Given one contact object and one null object.
-		contact = new Contact(TEST_NAME, TEST_PHONE_NUMBER);
+		contact = ContactFixture.getDefaultContact();
 		contact1 = null;
 				
 		//When equals method called.
@@ -132,7 +134,7 @@ public class ContactTest {
 	@Test
 	public void whenObjectAsParameterThenEqualsShouldReturnsFalse() {
 		//Given one contact object and one null object.
-		contact = new Contact(TEST_NAME, TEST_PHONE_NUMBER);
+		contact = ContactFixture.getDefaultContact();
 		Object contact2 = new Object();
 				
 		//When equals method called.
@@ -171,7 +173,7 @@ public class ContactTest {
 	@Test
 	public void whenTwoContactsHaveDifferentContentThenEqualsShouldReturnFalse() {
 		//Given two contact objects with different contents.
-		contact1 = new Contact(TEST_NAME, TEST_PHONE_NUMBER);
+		contact1 = ContactFixture.getDefaultContact();
 		contact2 = new Contact(EMPTY, EMPTY);
 				
 		//When equals method called.
@@ -186,7 +188,7 @@ public class ContactTest {
 	@Test
 	public void whenOneContactsHaveNullContentsThenEqualsShouldReturnFalse() {
 		//Given two contact objects with different contents.
-		contact1 = new Contact(TEST_NAME, TEST_PHONE_NUMBER);
+		contact1 = ContactFixture.getDefaultContact();
 		contact2 = new Contact(null, null);
 				
 		//When equals method called.
@@ -232,7 +234,7 @@ public class ContactTest {
 	@Test
 	public void whenTwoContactsHaveDifferentContentsThenHashCodeShouldReturnDifferent() {
 		//Given two contact objects with different contents.
-		contact1 = new Contact(TEST_NAME, TEST_PHONE_NUMBER);
+		contact1 = ContactFixture.getDefaultContact();
 		contact2 = new Contact(EMPTY, EMPTY);
 		
 		//when hash code called and returns different hash code.
@@ -354,8 +356,8 @@ public class ContactTest {
 
 
 	private void givenTwoContactHaveSameContent() {
-		contact1 = new Contact(TEST_NAME, TEST_PHONE_NUMBER);
-		contact2 = new Contact(TEST_NAME, TEST_PHONE_NUMBER);
+		contact1 = ContactFixture.getDefaultContact();
+		contact2 = ContactFixture.getDefaultContact();
 	}
 	
 }

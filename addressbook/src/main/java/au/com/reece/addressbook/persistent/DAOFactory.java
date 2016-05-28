@@ -40,7 +40,7 @@ public class DAOFactory {
 			File file = new File(name);
 			file.createNewFile();
 			FileInputStream fis = new FileInputStream(file);
-			FileOutputStream fos = new FileOutputStream(file, true);
+			FileOutputStream fos = new FileOutputStream(file);
 			dao = new FileContactDAO(fis, fos);
 		}
 		catch (Exception e) {

@@ -1,6 +1,7 @@
 package au.com.reece.addressbook.persistent;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -8,10 +9,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import au.com.reece.addressbook.AddressBook;
+import au.com.reece.addressbook.fixture.ContactFixture;
 import au.com.reece.addressbook.model.Contact;
 import au.com.reece.addressbook.model.ContactTest;
 
@@ -19,9 +24,16 @@ import au.com.reece.addressbook.model.ContactTest;
  * Test the FileContactDAO class
  *
  */
-public class FileContactDAOTest extends DefaultFileIntegrationTest {
-
+//public class FileContactDAOTest extends DefaultFileIntegrationTest {
+public class FileContactDAOTest {
 	private File file;
+	private FileContactDAO dao;
+	
+	@Before
+	public void setUp() {
+		file = null;
+		dao = null;
+	}
 
 	@Test
 	public void whenNullFileInputStreamProvidedThenConstructorShouldThrowIllegalArgumentException() {
@@ -42,7 +54,7 @@ public class FileContactDAOTest extends DefaultFileIntegrationTest {
 	}
 	
 	@Test
-	public void whenNullFileOutputStreamProvidedThenConstructorShouldThrowIllegalArgumentException() {
+	public void whenNullFileOutputStreamProvidedThenConstructorShouldThrowIllegalArgumentException()  {
 		//Given the null FileInputStream and FileOutputStream
 		FileInputStream fis = getFileInputStream();
 		FileOutputStream fos = null;
@@ -60,7 +72,7 @@ public class FileContactDAOTest extends DefaultFileIntegrationTest {
 	}
 
 	@Test
-	public void whenContactProvidedThenAddShouldBeReturnTrue() {
+	public void whenContactProvidedThenAddShouldBeReturnTrue()  {
 		//Given the Contact provided
 		Contact contact = new Contact(ContactTest.TEST_NAME, ContactTest.TEST_PHONE_NUMBER);
 		FileContactDAO dao = getFileContactDAO();
@@ -73,9 +85,9 @@ public class FileContactDAOTest extends DefaultFileIntegrationTest {
 	}
 	
 	@Test
-	public void whenCloseCalledThenTrueShouldReturn() {
+	public void whenCloseCalledThenTrueShouldReturn()  {
 		//Given the FileContactDAO provided
-		FileContactDAO dao = getFileContactDAO();
+		dao = getFileContactDAO();
 		
 		//When the close operation performed
 		boolean flag = dao.close();
@@ -84,7 +96,97 @@ public class FileContactDAOTest extends DefaultFileIntegrationTest {
 		assertTrue(flag);
 	}
 	
-	private FileContactDAO getFileContactDAO() {
+	@Test
+	public void whenGetAllContactCalledThenFullListShouldReturn()  {
+		givenPopulatedDAO();
+		
+		//When getAllContacts called
+		List<Contact> contacts = dao.getAllContacts(5);
+		
+		//Then the list should be fully populated
+		assertNotNull(contacts);
+	}
+	
+	@Test
+	public void whenGetFileContentCalledThen3ContactShouldReturn() throws IOException {
+		givenPopulatedDAO();
+		
+		//When getFileContents called
+		List<String> contents = dao.getFileContent(5);
+		
+		//Then 3 Strings should return
+		assertNotNull(contents);
+		assertTrue(3 == contents.size());
+	}
+	
+	@Test
+	public void whenGetFileContentCalledWith2AsMaxShouldReturn2Strings()  {
+		givenPopulatedDAO();
+		
+		//When getFileContents called with 2 as max size
+		List<String> contents = dao.getFileContent(2);
+		
+		//Then 2 Strings should return
+		assertNotNull(contents);
+		assertTrue(2 == contents.size());
+	}
+
+	@Test
+	public void when2StringsProvidedDoConversionShouldReturn2Contact() {
+		givenPopulatedDAO();
+		
+		//And getFileContents called with 2 as max size
+		List<String> contents = dao.getFileContent(2);
+		//And 2 contact list provided
+		List<Contact> contacts = new ArrayList<>(2);
+		
+		assertTrue(contacts.isEmpty());
+		
+		//When doContactConversion method called
+		this.dao.doContactConversion(contacts, contents);
+		
+		//Then contacts should has 2 contacts in the list
+		assertNotNull(contacts);
+		assertTrue(2 == contacts.size());
+		Contact contact1 = contacts.get(0);
+		assertNotNull(contact1);
+		assertEquals("John Smith", contact1.getName());
+		assertEquals("0414123456", contact1.getPhoneNumber());
+		Contact contact2 = contacts.get(1);
+		assertNotNull(contact2);
+		assertEquals("Richard Jones", contact2.getName());
+		assertEquals("0414789012", contact2.getPhoneNumber());
+	}
+	
+	@Test
+	public void whenFullContactProvidedThenDeleteShouldReturnTrue() {
+		//Given populated DAO and full contact
+		givenPopulatedDAO();
+		Contact contact = ContactFixture.getDefaultContact();
+		
+		//When delete method called
+		boolean flag = this.dao.delete(contact, 5);
+		
+		//Then the flag should true
+		assertTrue(flag);
+	}
+	
+	private void givenPopulatedDAO()  {
+		//Given the FileContactDAO provided
+		dao = getFileContactDAO();
+				
+		//And populated with contacts
+		givenFileContactDAOContacts();
+	}
+	
+	private void givenFileContactDAOContacts() {
+		List<Contact> contacts = ContactFixture.getListOfContacts();
+		this.dao.add(contacts.get(0));
+		this.dao.add(contacts.get(1));
+		this.dao.add(contacts.get(2));
+	}
+
+	private FileContactDAO getFileContactDAO()  {
 		FileInputStream fis = getFileInputStream();
 		FileOutputStream fos = getFileOutputStream();
 		return new FileContactDAO(fis, fos);
@@ -114,7 +216,7 @@ public class FileContactDAOTest extends DefaultFileIntegrationTest {
 		return fis;
 	}
 
-	private void getFile() throws IOException {
+	private void getFile() throws IOException  {
 		if (null == file) {
 			file = new File(AddressBook.DEFAULT_NAME);
 			file.createNewFile();

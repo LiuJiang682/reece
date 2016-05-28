@@ -59,13 +59,17 @@ public class AddressBook {
 		this.dao = DAOFactory.createDAO(this.name, this.daoType);
 	}
 
+	/**
+	 * Add a new contact into the address book.
+	 * @param contact new contact.
+	 * @return true if everything works.
+	 */
 	public boolean add(Contact contact) {
 		return this.dao.add(contact);
 	}
 
-	public List<Contact> getAllContacts() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Contact> getAllContacts(final int max) {
+		return this.dao.getAllContacts(max);
 	}
 
 	public String getName() {
@@ -78,6 +82,25 @@ public class AddressBook {
 
 	public Object getDaoType() {
 		return daoType;
+	}
+
+	/**
+	 * Adds a list of contacts into address book.
+	 * @param contacts list of contacts
+	 * @return true if everything goes well.
+	 */
+	public boolean add(List<Contact> contacts) {
+		for (Contact contact : contacts) {
+			boolean flag = this.add(contact);
+			if (!flag) {
+				return flag;
+			}
+		}
+		return true;
+	}
+
+	public boolean delete(Contact contact, int listLimit) {
+		return this.dao.delete(contact, listLimit);
 	}
 
 }
