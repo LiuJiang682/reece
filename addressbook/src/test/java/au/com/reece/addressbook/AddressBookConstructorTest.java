@@ -6,12 +6,14 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
 
+import au.com.reece.addressbook.persistent.DefaultFileIntegrationTest;
+
 /**
  * In order to keep track customer contacts
  * As a Reece branch manager
  * I want to have an address book on my PC
  */
-public class AddressBookConstructorTest {
+public class AddressBookConstructorTest extends DefaultFileIntegrationTest {
 
 	private AddressBook addressBook;
 	

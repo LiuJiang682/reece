@@ -1,5 +1,9 @@
 package au.com.reece.addressbook.persistent;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
 /**
  * This factory products the DAO object for the address
  * book. 
@@ -30,7 +34,18 @@ public class DAOFactory {
 	}
 
 	protected static ContactDAO createFileDAO(String name) {
-		FileContactDAO dao = new FileContactDAO(name);
+		FileContactDAO dao = null;
+		
+		try {
+			File file = new File(name);
+			file.createNewFile();
+			FileInputStream fis = new FileInputStream(file);
+			FileOutputStream fos = new FileOutputStream(file, true);
+			dao = new FileContactDAO(fis, fos);
+		}
+		catch (Exception e) {
+			throw new UnsupportedOperationException(e.getMessage(), e);
+		}
 		return dao;
 	}
 

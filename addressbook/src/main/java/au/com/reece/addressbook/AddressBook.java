@@ -59,9 +59,8 @@ public class AddressBook {
 		this.dao = DAOFactory.createDAO(this.name, this.daoType);
 	}
 
-	public void add(Contact contact) {
-		// TODO Auto-generated method stub
-		
+	public boolean add(Contact contact) {
+		return this.dao.add(contact);
 	}
 
 	public List<Contact> getAllContacts() {
