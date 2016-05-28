@@ -15,10 +15,11 @@ import org.junit.Test;
  */
 public class ContactTest {
 
-	private static final String EMPTY = "";
 	private static final int NOT_INIT = -1;
-	private static final String TEST_PHONE_NUMBER = "0414123456";
-	private static final String TEST_NAME = "John Smith";
+	public static final String TEST_PHONE_NUMBER = "0414123456";
+	public static final String TEST_NAME = "John Smith";
+	public static final String EMPTY = "";
+	
 	private String name;
 	private String phoneNumber;
 	private Contact contact;
