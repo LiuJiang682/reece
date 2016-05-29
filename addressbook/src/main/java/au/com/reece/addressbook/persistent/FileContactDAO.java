@@ -1,8 +1,11 @@
 package au.com.reece.addressbook.persistent;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -18,8 +21,6 @@ import au.com.reece.addressbook.utils.StringUtils;
  */
 public class FileContactDAO implements ContactDAO {
 
-	private static final int DEFAULT_MAX_SIZE = 3000;
-
 	private static final int ONE = 1;
 
 	private static final int ZERO = 0;
@@ -34,20 +35,30 @@ public class FileContactDAO implements ContactDAO {
 
 	private static final String CHAR_SET_UTF_8 = "UTF-8";
 
-	private static final String LINE_SEPARATOR = "\n";
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	
 	private FileInputStream fis;
 	private FileOutputStream fos;
+	private String fileName;
+	private File file;
 	
-	public FileContactDAO(final FileInputStream fis, final FileOutputStream fos) {
-		if (null == fis) {
-			throw new IllegalArgumentException("fis cannot be null!");
+	public FileContactDAO(final String fileName) {
+		if (StringUtils.isBlank(fileName)) {
+			throw new IllegalArgumentException("file name cannot be null!");
 		}
-		if (null == fos) {
-			throw new IllegalArgumentException("fos cannot be null!");
+		
+		this.fileName = fileName;
+		try {
+			file = new File(this.fileName);
+			file.createNewFile();
+			FileInputStream fis = new FileInputStream(file);
+			FileOutputStream fos = new FileOutputStream(file);
+			this.fis = fis;
+			this.fos = fos;
 		}
-		this.fis = fis;
-		this.fos = fos;
+		catch (Exception e) {
+			throw new UnsupportedOperationException(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -106,6 +117,11 @@ public class FileContactDAO implements ContactDAO {
 		return true;
 	}
 
+	/**
+	 * This method returns a list of contacts up to the size
+	 * of max.
+	 * @param max the max size of list.
+	 */
 	@Override
 	public List<Contact> getAllContacts(final int max) {
 		List<Contact> contacts = new ArrayList<>(max);
@@ -146,22 +162,67 @@ public class FileContactDAO implements ContactDAO {
 		return contents;
 	}
 
+	/**
+	 * This method deletes one record from file. 
+	 * 
+	 * @param contact the contact need to delete.
+	 */
 	@Override
-	public boolean delete(Contact contact, int listLimit) {
-		int size = listLimit;
-		if (size <= 0) {
-			size = DEFAULT_MAX_SIZE;
-		}
-		List<Contact> allContacts = getAllContacts(listLimit);
-		boolean hasMoreRecord = size == allContacts.size();
-		do {
-			boolean successRemoved = allContacts.remove(contact);
-			if (successRemoved) {
-				//Found the exactly matched.
-				
+	public boolean delete(Contact contact) {
+		boolean success = true;
+		boolean deleted = false;
+		try {
+			String tempFileName = fileName + System.currentTimeMillis();
+			File tempFile = new File(tempFileName); 
+			BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis, CHAR_SET_UTF_8));
+			
+			String lineToDelete = contact.toString();
+			String currentLine;
+			while(null != (currentLine = bufferedReader.readLine())) {
+				String trimmedLine = currentLine.trim();
+				if (trimmedLine.equals(lineToDelete)) {
+					deleted = true;
+					continue;
+				}
+				writer.write(currentLine + LINE_SEPARATOR);
+			}
+			
+			//Done! Clean up resource. 
+			writer.flush();
+			writer.close();
+			bufferedReader.close();
+			fis.close();
+			
+			// Replace the old file with temp file.
+			success = file.delete();
+			if (success) {
+				success = tempFile.renameTo(file);
+			}
+			// Points the file and inputStream to
+			// the new file.
+			if (success) {
+				file = new File(fileName);
+				fis = new FileInputStream(file);
 			}
 		}
-		while(hasMoreRecord);
-		return false;
+		catch (Exception e) {
+			e.printStackTrace();
+			success = false;
+		}
+		return success && deleted;
+	}
+
+	@Override
+	public List<Contact> delete(List<Contact> contacts) {
+		List<Contact> undeleted = new ArrayList<>();
+		
+		for (Contact contact : contacts) {
+			boolean success = this.delete(contact);
+			if (!success) {
+				undeleted.add(contact);
+			}
+		}
+		return undeleted;
 	}
 }

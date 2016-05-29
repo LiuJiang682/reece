@@ -1,7 +1,15 @@
 package au.com.reece.addressbook;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +18,7 @@ import org.junit.Test;
 import au.com.reece.addressbook.fixture.ContactFixture;
 import au.com.reece.addressbook.model.Contact;
 import au.com.reece.addressbook.model.ContactTest;
+import au.com.reece.addressbook.persistent.DefaultFileIntegrationTest;
 
 /**
  * In order to keep track customer contacts
@@ -17,15 +26,16 @@ import au.com.reece.addressbook.model.ContactTest;
  * I want to add new contacts to address book when new 
  * contact received
  */
-public class AddressBookAddContactTest {
+public class AddressBookAddContactTest extends DefaultFileIntegrationTest {
 
 	/**
 	 * Given that a new contact is created and address book exist
 	 * When I add the new contact into address book
 	 * Then I should have the new contact in address book
+	 * @throws IOException 
 	 */
 	@Test
-	public void newContactShouldBeAddedToAddressBook() {
+	public void newContactShouldBeAddedToAddressBook() throws IOException {
 		// Given a new contact and a default address book created.
 		Contact contact = new Contact(ContactTest.EMPTY, ContactTest.EMPTY);
 		AddressBook addressBook = new AddressBook();
@@ -35,11 +45,14 @@ public class AddressBookAddContactTest {
 		
 		//Then I should have the contact.
 		assertTrue(flag);
-//		AddressBook populatedAddressBook = new AddressBook();
-//		List<Contact> contacts = populatedAddressBook.getAllContacts();
-//		assertNotNull(contacts);
-//		assertTrue(1 == contacts.size());
-//		assertEquals(contact, contacts.get(0));
+		File file = new File(AddressBook.DEFAULT_NAME);
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+		String line1 = bufferedReader.readLine();
+		assertNotNull(line1); 
+		assertEquals("name=,phoneNumber=", line1);
+		String line2 = bufferedReader.readLine();
+		assertNull(line2);
+		bufferedReader.close();
 	}
 	
 	/**

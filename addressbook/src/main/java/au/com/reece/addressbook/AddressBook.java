@@ -99,8 +99,24 @@ public class AddressBook {
 		return true;
 	}
 
-	public boolean delete(Contact contact, int listLimit) {
-		return this.dao.delete(contact, listLimit);
+	/**
+	 * Delete a contact from address book.
+	 * @param contact the contact needs to delete.
+	 * @return true if everything goes well.
+	 */
+	public boolean delete(Contact contact) {
+		return this.dao.delete(contact);
+	}
+
+	/**
+	 * Delete a list of contacts from address book.
+	 * Returns any contact failed to delete.
+	 * 
+	 * @param contacts list of contact needs to delete.
+	 * @return any contacts delete operation failed.
+	 */
+	public List<Contact> delete(List<Contact> contacts) {
+		return this.dao.delete(contacts);
 	}
 
 }

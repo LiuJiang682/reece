@@ -22,4 +22,12 @@ public class ContactFixture {
 	public static Contact getDefaultContact() {
 		return new Contact(ContactTest.TEST_NAME, ContactTest.TEST_PHONE_NUMBER);
 	}
+	
+	public static Contact getWillsContact() {
+		return new Contact("Will Pang", "0414345678");
+	}
+
+	public static Contact getRichardsContact() {
+		return new Contact("Richard Jones", "0414789012");
+	}
 }

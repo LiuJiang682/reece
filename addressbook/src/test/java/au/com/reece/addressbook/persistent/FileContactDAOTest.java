@@ -2,13 +2,15 @@ package au.com.reece.addressbook.persistent;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,63 +20,41 @@ import org.junit.Test;
 import au.com.reece.addressbook.AddressBook;
 import au.com.reece.addressbook.fixture.ContactFixture;
 import au.com.reece.addressbook.model.Contact;
-import au.com.reece.addressbook.model.ContactTest;
 
 /**
  * Test the FileContactDAO class
  *
  */
-//public class FileContactDAOTest extends DefaultFileIntegrationTest {
-public class FileContactDAOTest {
-	private File file;
+public class FileContactDAOTest extends DefaultFileIntegrationTest {
+
 	private FileContactDAO dao;
 	
 	@Before
 	public void setUp() {
-		file = null;
 		dao = null;
-	}
-
-	@Test
-	public void whenNullFileInputStreamProvidedThenConstructorShouldThrowIllegalArgumentException() {
-		//Given the null FileInputStream and FileOutputStream
-		FileInputStream fis = null;
-		FileOutputStream fos = null;
-		
-		//When the constructor is called
-		try {
-			new FileContactDAO(fis, fos);
-			fail("Program reached unexpected point.");
-		}
-		catch (IllegalArgumentException e) {
-			//Then assert the IllegalArgumentException
-			String message = e.getMessage();
-			assertEquals("fis cannot be null!", message);
-		}
 	}
 	
 	@Test
-	public void whenNullFileOutputStreamProvidedThenConstructorShouldThrowIllegalArgumentException()  {
-		//Given the null FileInputStream and FileOutputStream
-		FileInputStream fis = getFileInputStream();
-		FileOutputStream fos = null;
+	public void whenNullFileNameProvidedThenConstructorShouldThrowIllegalArgumentException()  {
+		//Given the null file name
+		String fileName = null;
 		
 		//When the constructor is called
 		try {
-			new FileContactDAO(fis, fos);
+			new FileContactDAO(fileName);
 			fail("Program reached unexpected point.");
 		}
 		catch (IllegalArgumentException e) {
 			//Then assert the IllegalArgumentException
 			String message = e.getMessage();
-			assertEquals("fos cannot be null!", message);
+			assertEquals("file name cannot be null!", message);
 		}
 	}
 
 	@Test
 	public void whenContactProvidedThenAddShouldBeReturnTrue()  {
 		//Given the Contact provided
-		Contact contact = new Contact(ContactTest.TEST_NAME, ContactTest.TEST_PHONE_NUMBER);
+		Contact contact = ContactFixture.getDefaultContact();
 		FileContactDAO dao = getFileContactDAO();
 		
 		//When the add operation performed
@@ -159,16 +139,51 @@ public class FileContactDAOTest {
 	}
 	
 	@Test
-	public void whenFullContactProvidedThenDeleteShouldReturnTrue() {
+	public void whenFullContactProvidedThenDeleteShouldReturnTrue() throws IOException {
 		//Given populated DAO and full contact
 		givenPopulatedDAO();
 		Contact contact = ContactFixture.getDefaultContact();
 		
 		//When delete method called
-		boolean flag = this.dao.delete(contact, 5);
+		boolean flag = this.dao.delete(contact);
 		
 		//Then the flag should true
 		assertTrue(flag);
+		File file = new File(AddressBook.DEFAULT_NAME);
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+		String line1 = bufferedReader.readLine();
+		assertNotNull(line1); 
+		assertEquals("name=Richard Jones,phoneNumber=0414789012", line1);
+		String line2 = bufferedReader.readLine();
+		assertNotNull(line2);
+		assertEquals("name=Will Pang,phoneNumber=0414345678", line2);
+		String line3 = bufferedReader.readLine();
+		assertNull(line3);
+		bufferedReader.close();
+	}
+	
+	@Test
+	public void whenContactsProvidedThenDeleteShouldReturnTrue() throws IOException {
+		//Given populated DAO and full contact
+		givenPopulatedDAO();
+		List<Contact> contacts = new ArrayList<>();
+		contacts.add(ContactFixture.getWillsContact());
+		contacts.add(ContactFixture.getRichardsContact());
+		
+		//When delete method called
+		List<Contact> undeleted = this.dao.delete(contacts);
+		
+		//Then the flag should true
+		assertNotNull(undeleted);
+		assertTrue(undeleted.isEmpty());
+		File file = new File(AddressBook.DEFAULT_NAME);
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+		String line1 = bufferedReader.readLine();
+		assertNotNull(line1); 
+		assertEquals("name=John Smith,phoneNumber=0414123456", line1);
+		String line2 = bufferedReader.readLine();
+		assertNull(line2);
+		bufferedReader.close();
 	}
 	
 	private void givenPopulatedDAO()  {
@@ -187,41 +202,13 @@ public class FileContactDAOTest {
 	}
 
 	private FileContactDAO getFileContactDAO()  {
-		FileInputStream fis = getFileInputStream();
-		FileOutputStream fos = getFileOutputStream();
-		return new FileContactDAO(fis, fos);
-	}
-
-	private FileOutputStream getFileOutputStream() {
-		FileOutputStream fos = null;
-		try {
-			getFile();
-			fos = new FileOutputStream(file);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return fos;
-	}
-
-	private FileInputStream getFileInputStream() {
-		FileInputStream fis = null;
-		try {
-			getFile();
-			fis = new FileInputStream(file);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return fis;
-	}
-
-	private void getFile() throws IOException  {
-		if (null == file) {
-			file = new File(AddressBook.DEFAULT_NAME);
-			file.createNewFile();
-		}
+		return new FileContactDAO(AddressBook.DEFAULT_NAME);
 	}
 	
-	
+	/**
+	 * More tests should be added for the negative test cases
+	 * on file related operation, however, with any mocking
+	 * framework, it is very different to simulate the exception
+	 * raising during file operation.
+	 */
 }

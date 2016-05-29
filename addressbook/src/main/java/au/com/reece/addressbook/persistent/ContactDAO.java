@@ -9,5 +9,6 @@ public interface ContactDAO {
 	public boolean add(final Contact contact);
 	public boolean close();
 	public List<Contact> getAllContacts(final int max);
-	public boolean delete(final Contact contact, final int listLimit);
+	public boolean delete(final Contact contact);
+	public List<Contact> delete(List<Contact> contacts);
 }

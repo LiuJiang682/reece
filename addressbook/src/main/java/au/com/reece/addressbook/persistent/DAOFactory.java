@@ -34,18 +34,18 @@ public class DAOFactory {
 	}
 
 	protected static ContactDAO createFileDAO(String name) {
-		FileContactDAO dao = null;
+		FileContactDAO dao = new FileContactDAO(name);
 		
-		try {
-			File file = new File(name);
-			file.createNewFile();
-			FileInputStream fis = new FileInputStream(file);
-			FileOutputStream fos = new FileOutputStream(file);
-			dao = new FileContactDAO(fis, fos);
-		}
-		catch (Exception e) {
-			throw new UnsupportedOperationException(e.getMessage(), e);
-		}
+//		try {
+//			File file = new File(name);
+//			file.createNewFile();
+//			FileInputStream fis = new FileInputStream(file);
+//			FileOutputStream fos = new FileOutputStream(file);
+//			dao = new FileContactDAO(name, fis, fos);
+//		}
+//		catch (Exception e) {
+//			throw new UnsupportedOperationException(e.getMessage(), e);
+//		}
 		return dao;
 	}
 
