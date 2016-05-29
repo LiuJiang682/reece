@@ -35,7 +35,7 @@ public class FileContactDAO implements ContactDAO {
 
 	private static final String CHAR_SET_UTF_8 = "UTF-8";
 
-	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	
 	private FileInputStream fis;
 	private FileOutputStream fos;

@@ -20,6 +20,7 @@ import org.junit.Test;
 import au.com.reece.addressbook.AddressBook;
 import au.com.reece.addressbook.fixture.ContactFixture;
 import au.com.reece.addressbook.model.Contact;
+import au.com.reece.addressbook.model.ContactTest;
 
 /**
  * Test the FileContactDAO class
@@ -183,6 +184,37 @@ public class FileContactDAOTest extends DefaultFileIntegrationTest {
 		assertEquals("name=John Smith,phoneNumber=0414123456", line1);
 		String line2 = bufferedReader.readLine();
 		assertNull(line2);
+		bufferedReader.close();
+	}
+	
+	@Test
+	public void whenContactsProvidedThenDeleteShouldReturnTruePartialDeleted() throws IOException {
+		//Given populated DAO and full contact
+		givenPopulatedDAO();
+		List<Contact> contacts = new ArrayList<>();
+		contacts.add(ContactFixture.getWillsContact());
+		contacts.add(new Contact(ContactTest.EMPTY, ContactTest.EMPTY));
+		
+		//When delete method called
+		List<Contact> undeleted = this.dao.delete(contacts);
+		
+		//Then the flag should true
+		assertNotNull(undeleted);
+		assertTrue(1 == undeleted.size());
+		Contact undeletedContact = undeleted.get(0);
+		assertEquals(ContactTest.EMPTY, undeletedContact.getName());
+		assertEquals(ContactTest.EMPTY, undeletedContact.getPhoneNumber());
+		
+		File file = new File(AddressBook.DEFAULT_NAME);
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+		String line1 = bufferedReader.readLine();
+		assertNotNull(line1); 
+		assertEquals("name=John Smith,phoneNumber=0414123456", line1);
+		String line2 = bufferedReader.readLine();
+		assertNotNull(line2);
+		assertEquals("name=Richard Jones,phoneNumber=0414789012", line2);
+		String line3 = bufferedReader.readLine();
+		assertNull(line3);
 		bufferedReader.close();
 	}
 	
