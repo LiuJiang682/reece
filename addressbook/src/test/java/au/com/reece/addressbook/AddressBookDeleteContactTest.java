@@ -48,10 +48,10 @@ public class AddressBookDeleteContactTest extends DefaultFileIntegrationTest {
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 		String line1 = bufferedReader.readLine();
 		assertNotNull(line1); 
-		assertEquals("name=John Smith,phoneNumber=0414123456", line1);
+		assertEquals("id=0,name=John Smith,phoneNumber=0414123456", line1);
 		String line2 = bufferedReader.readLine();
 		assertNotNull(line2);
-		assertEquals("name=Richard Jones,phoneNumber=0414789012", line2);
+		assertEquals("id=1,name=Richard Jones,phoneNumber=0414789012", line2);
 		String line3 = bufferedReader.readLine();
 		assertNull(line3);
 		bufferedReader.close();

@@ -37,7 +37,7 @@ public class AddressBookAddContactTest extends DefaultFileIntegrationTest {
 	@Test
 	public void newContactShouldBeAddedToAddressBook() throws IOException {
 		// Given a new contact and a default address book created.
-		Contact contact = new Contact(ContactTest.EMPTY, ContactTest.EMPTY);
+		Contact contact = new Contact(ContactTest.TEST_ID, ContactTest.EMPTY, ContactTest.EMPTY);
 		AddressBook addressBook = new AddressBook();
 		
 		// When I add the contact into default address book.
@@ -49,7 +49,7 @@ public class AddressBookAddContactTest extends DefaultFileIntegrationTest {
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 		String line1 = bufferedReader.readLine();
 		assertNotNull(line1); 
-		assertEquals("name=,phoneNumber=", line1);
+		assertEquals("id=0,name=,phoneNumber=", line1);
 		String line2 = bufferedReader.readLine();
 		assertNull(line2);
 		bufferedReader.close();
@@ -64,7 +64,7 @@ public class AddressBookAddContactTest extends DefaultFileIntegrationTest {
 	public void newListofContactShouldBeAddedToAddressBook() {
 		// Given a new list of contact and a default address book created.
 		List<Contact> contacts = new ArrayList<Contact>();
-		Contact contact = new Contact(ContactTest.EMPTY, ContactTest.EMPTY);
+		Contact contact = new Contact(ContactTest.TEST_ID, ContactTest.EMPTY, ContactTest.EMPTY);
 		contacts.add(contact);
 		Contact anthor = ContactFixture.getDefaultContact();
 		contacts.add(anthor);

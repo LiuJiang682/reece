@@ -10,24 +10,24 @@ public class ContactFixture {
 
 	public static List<Contact> getListOfContacts() {
 		List<Contact> contacts = new ArrayList<>(3);
-		Contact contact = new Contact(ContactTest.TEST_NAME, ContactTest.TEST_PHONE_NUMBER);
+		Contact contact = new Contact(ContactTest.TEST_ID, ContactTest.TEST_NAME, ContactTest.TEST_PHONE_NUMBER);
 		contacts.add(contact);
-		Contact contact1 = new Contact("Richard Jones", "0414789012");
+		Contact contact1 = new Contact(1, "Richard Jones", "0414789012");
 		contacts.add(contact1);
-		Contact contact2 = new Contact("Will Pang", "0414345678");
+		Contact contact2 = new Contact(2, "Will Pang", "0414345678");
 		contacts.add(contact2);
 		return contacts;
 	}
 	
 	public static Contact getDefaultContact() {
-		return new Contact(ContactTest.TEST_NAME, ContactTest.TEST_PHONE_NUMBER);
+		return new Contact(ContactTest.TEST_ID, ContactTest.TEST_NAME, ContactTest.TEST_PHONE_NUMBER);
 	}
 	
 	public static Contact getWillsContact() {
-		return new Contact("Will Pang", "0414345678");
+		return new Contact(2, "Will Pang", "0414345678");
 	}
 
 	public static Contact getRichardsContact() {
-		return new Contact("Richard Jones", "0414789012");
+		return new Contact(1, "Richard Jones", "0414789012");
 	}
 }

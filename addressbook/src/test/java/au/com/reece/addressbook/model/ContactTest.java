@@ -17,11 +17,14 @@ import au.com.reece.addressbook.fixture.ContactFixture;
  */
 public class ContactTest {
 
+	private static final int ZERO = 0;
 	private static final int NOT_INIT = -1;
 	public static final String TEST_PHONE_NUMBER = "0414123456";
 	public static final String TEST_NAME = "John Smith";
 	public static final String EMPTY = "";
+	public static final long TEST_ID = ZERO;
 	
+	private long id;
 	private String name;
 	private String phoneNumber;
 	private Contact contact;
@@ -34,6 +37,7 @@ public class ContactTest {
 	
 	@Before
 	public void setUp() {
+		id = NOT_INIT;
 		name = null;
 		phoneNumber = null;
 		contact = null;
@@ -47,15 +51,17 @@ public class ContactTest {
 
 	@Test
 	public void whenBothNameAndPhoneNumberAssignedThenConstructorShouldBeCorrectlyAssignField() {
-		//Given the name and phone number.
+		//Given the id, name and phone number.
+		id = TEST_ID;
 		name = TEST_NAME;
 		phoneNumber = TEST_PHONE_NUMBER;
 		 
 		//When call constructor.
-		contact = new Contact(name, phoneNumber);
+		contact = new Contact(id, name, phoneNumber);
 		
 		//Then all fields should correctly assigned.
 		assertNotNull(contact);
+		assertEquals(TEST_ID, contact.getId());
 		assertEquals(TEST_NAME, contact.getName());
 		assertEquals(TEST_PHONE_NUMBER, contact.getPhoneNumber());
 	}
@@ -68,10 +74,11 @@ public class ContactTest {
 		phoneNumber = TEST_PHONE_NUMBER;
 		 
 		//When call constructor.
-		contact = new Contact(name, phoneNumber);
+		contact = new Contact(TEST_ID, name, phoneNumber);
 		
 		//Then name should returns null.
 		assertNotNull(contact);
+		assertEquals(TEST_ID, contact.getId());
 		assertNull(contact.getName());
 		assertEquals(TEST_PHONE_NUMBER, contact.getPhoneNumber());
 	}
@@ -83,10 +90,11 @@ public class ContactTest {
 		phoneNumber = null;
 		 
 		//When call constructor.
-		contact = new Contact(name, phoneNumber);
+		contact = new Contact(TEST_ID, name, phoneNumber);
 		
 		//Then phone number should returns null.
 		assertNotNull(contact);
+		assertEquals(TEST_ID, contact.getId());
 		assertEquals(TEST_NAME, contact.getName());
 		assertNull(contact.getPhoneNumber());
 	}
@@ -98,10 +106,11 @@ public class ContactTest {
 		phoneNumber = null;
 		 
 		//When call constructor.
-		contact = new Contact(name, phoneNumber);
+		contact = new Contact(TEST_ID, name, phoneNumber);
 		
 		//Then all fields should return null.
 		assertNotNull(contact);
+		assertEquals(TEST_ID, contact.getId());
 		assertNull(contact.getName());
 		assertNull(contact.getPhoneNumber());
 	}
@@ -145,7 +154,7 @@ public class ContactTest {
 	}
 	
 	@Test
-	public void whenTwoContactsHaveSameContentThenEqualsShouldBeSymmetric() {
+	public void whenTwoContactsHaveSameIDThenEqualsShouldBeSymmetric() {
 		givenTwoContactHaveSameContent();
 		
 		//When equals method called.
@@ -171,10 +180,10 @@ public class ContactTest {
 	}
 	
 	@Test
-	public void whenTwoContactsHaveDifferentContentThenEqualsShouldReturnFalse() {
+	public void whenTwoContactsHaveDifferentIDThenEqualsShouldReturnFalse() {
 		//Given two contact objects with different contents.
 		contact1 = ContactFixture.getDefaultContact();
-		contact2 = new Contact(EMPTY, EMPTY);
+		contact2 = new Contact(1, EMPTY, EMPTY);
 				
 		//When equals method called.
 		boolean c1SameAsC2 = contact1.equals(contact2);
@@ -186,10 +195,9 @@ public class ContactTest {
 	}
 	
 	@Test
-	public void whenOneContactsHaveNullContentsThenEqualsShouldReturnFalse() {
-		//Given two contact objects with different contents.
-		contact1 = ContactFixture.getDefaultContact();
-		contact2 = new Contact(null, null);
+	public void whenTwoContactsHaveDifferentNullFieldsAndDifferentIDThenEqualsShouldReturnFalse() {
+		contact1 = new Contact(TEST_ID, TEST_NAME, null);
+		contact2 = new Contact(1, null, TEST_PHONE_NUMBER);
 				
 		//When equals method called.
 		boolean c1SameAsC2 = contact1.equals(contact2);
@@ -201,16 +209,17 @@ public class ContactTest {
 	}
 	
 	@Test
-	public void whenTwoContactsHaveDifferentNullFieldsThenEqualsShouldReturnFalse() {
-		givenTwoContactsWithDifferentNullField();
+	public void whenTwoContactsHaveDifferentNullFieldsAndSameIDThenEqualsShouldReturnTrue() {
+		contact1 = new Contact(TEST_ID, TEST_NAME, null);
+		contact2 = new Contact(TEST_ID, null, TEST_PHONE_NUMBER);
 				
 		//When equals method called.
 		boolean c1SameAsC2 = contact1.equals(contact2);
 		boolean c2SameAsC1 = contact2.equals(contact1);
 				
 		//Then both flags should be false.
-		assertFalse(c1SameAsC2);
-		assertFalse(c2SameAsC1);
+		assertTrue(c1SameAsC2);
+		assertTrue(c2SameAsC1);
 	}
 	
 	@Test
@@ -232,10 +241,10 @@ public class ContactTest {
 	}
 	
 	@Test
-	public void whenTwoContactsHaveDifferentContentsThenHashCodeShouldReturnDifferent() {
+	public void whenTwoContactsHaveDifferentContentsAndIDThenHashCodeShouldReturnDifferent() {
 		//Given two contact objects with different contents.
 		contact1 = ContactFixture.getDefaultContact();
-		contact2 = new Contact(EMPTY, EMPTY);
+		contact2 = new Contact(1, EMPTY, EMPTY);
 		
 		//when hash code called and returns different hash code.
 		whenHashCodeCalledAndReturnsDifferent();
@@ -244,10 +253,21 @@ public class ContactTest {
 	@Test
 	public void whenTwoContactsHaveOneDifferentNullFieldsThenHashCodeShouldReturnDifferent() {
 		// Given two contact object with different null field.
-		givenTwoContactsWithDifferentNullField();
+		contact1 = new Contact(ZERO, TEST_NAME, null);
+		contact2 = new Contact(1, null, TEST_PHONE_NUMBER);
 		
 		//when hash code called and returns different hash code.
 		whenHashCodeCalledAndReturnsDifferent();
+	}
+	
+	@Test
+	public void whenTwoContactsHaveOneDifferentNullFieldsSameIDThenHashCodeShouldReturnDifferent() {
+		// Given two contact object with different null field.
+		contact1 = new Contact(ZERO, TEST_NAME, null);
+		contact2 = new Contact(ZERO, null, TEST_PHONE_NUMBER);
+		
+		//when hash code called and returns different hash code.
+		whenHashCodeCalledAndReturnsSame();
 	}
 	
 	@Test
@@ -262,8 +282,8 @@ public class ContactTest {
 		assertStringNotNull();
 		assertEquals(string1, string2);
 		assertStringContent();
-		assertEquals("name=John Smith,phoneNumber=0414123456", string1);
-		assertEquals("name=John Smith,phoneNumber=0414123456", string2);
+		assertEquals("id=0,name=John Smith,phoneNumber=0414123456", string1);
+		assertEquals("id=0,name=John Smith,phoneNumber=0414123456", string2);
 	}
 	
 	@Test
@@ -277,8 +297,8 @@ public class ContactTest {
 		assertStringNotNull();
 		assertEquals(string1, string2);
 		assertStringContent();
-		assertEquals("name=null,phoneNumber=null", string1);
-		assertEquals("name=null,phoneNumber=null", string2);
+		assertEquals("id=0,name=null,phoneNumber=null", string1);
+		assertEquals("id=0,name=null,phoneNumber=null", string2);
 	}
 	
 	@Test
@@ -293,13 +313,15 @@ public class ContactTest {
 		assertStringNotNull();
 		assertFalse(string1.equals(string2));
 		assertStringContent();
-		assertEquals("name=John Smith,phoneNumber=null", string1);
-		assertEquals("name=null,phoneNumber=0414123456", string2);
+		assertEquals("id=0,name=John Smith,phoneNumber=null", string1);
+		assertEquals("id=0,name=null,phoneNumber=0414123456", string2);
 	}
 
 	private void assertStringContent() {
+		assertTrue(string1.contains("id="));
 		assertTrue(string1.contains("name="));
 		assertTrue(string1.contains("phoneNumber="));
+		assertTrue(string2.contains("id="));
 		assertTrue(string2.contains("name="));
 		assertTrue(string2.contains("phoneNumber="));
 	}
@@ -315,8 +337,8 @@ public class ContactTest {
 	}
 
 	private void givenTwoContactsWithDifferentNullField() {
-		contact1 = new Contact(TEST_NAME, null);
-		contact2 = new Contact(null, TEST_PHONE_NUMBER);
+		contact1 = new Contact(ZERO, TEST_NAME, null);
+		contact2 = new Contact(ZERO, null, TEST_PHONE_NUMBER);
 	}
 
 	private void whenHashCodeCalledAndReturnsDifferent() {
@@ -350,8 +372,8 @@ public class ContactTest {
 
 
 	private void givenTwoContactHaveAllNullField() {
-		contact1 = new Contact(null, null);
-		contact2 = new Contact(null, null);
+		contact1 = new Contact(ZERO, null, null);
+		contact2 = new Contact(ZERO, null, null);
 	}
 
 

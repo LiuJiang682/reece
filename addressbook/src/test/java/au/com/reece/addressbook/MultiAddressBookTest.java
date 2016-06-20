@@ -214,7 +214,7 @@ public class MultiAddressBookTest {
 		Path path = abc.toPath();
 		BufferedReader reader = Files.newBufferedReader(path, Charset.defaultCharset());
 		String line1 = reader.readLine();
-		assertEquals("name=John Smith,phoneNumber=0414123456", line1);
+		assertEquals("id=0,name=John Smith,phoneNumber=0414123456", line1);
 		String line2 = reader.readLine();
 		assertNull(line2);
 		abc.delete();
@@ -435,7 +435,7 @@ public class MultiAddressBookTest {
 		addressBooks.add(null, ContactFixture.getRichardsContact());
 		addressBooks.add(null, ContactFixture.getWillsContact());
 		addressBooks.add("abc", ContactFixture.getDefaultContact());
-		addressBooks.add("abc", new Contact("David Goldsmith", "0414666777"));
+		addressBooks.add("abc", new Contact(5, "David Goldsmith", "0414666777"));
 		
 		//When getAllUniqueContentAsOne method called
 		List<Contact> contacts = addressBooks.getAllUniqueContentAsOne();
@@ -444,17 +444,24 @@ public class MultiAddressBookTest {
 		assertNotNull(contacts);
 		assertTrue(4 == contacts.size());
 		Contact contact1 = contacts.get(0);
-		assertEquals("Richard Jones", contact1.getName());
-		assertEquals("0414789012", contact1.getPhoneNumber());
+		assertEquals(0, contact1.getId());
+		assertEquals("John Smith", contact1.getName());
+		assertEquals("0414123456", contact1.getPhoneNumber());
+
 		Contact contact2 = contacts.get(1);
-		assertEquals("Will Pang", contact2.getName());
-		assertEquals("0414345678", contact2.getPhoneNumber());
+		assertEquals(1, contact2.getId());
+		assertEquals("Richard Jones", contact2.getName());
+		assertEquals("0414789012", contact2.getPhoneNumber());
+		
 		Contact contact3 = contacts.get(2);
-		assertEquals("David Goldsmith", contact3.getName());
-		assertEquals("0414666777", contact3.getPhoneNumber());
+		assertEquals(2, contact3.getId());
+		assertEquals("Will Pang", contact3.getName());
+		assertEquals("0414345678", contact3.getPhoneNumber());
+
 		Contact contact4 = contacts.get(3);
-		assertEquals("John Smith", contact4.getName());
-		assertEquals("0414123456", contact4.getPhoneNumber());
+		assertEquals(5, contact4.getId());
+		assertEquals("David Goldsmith", contact4.getName());
+		assertEquals("0414666777", contact4.getPhoneNumber());
 	}
 
 	private File givenDefaultContent(Contact contact) throws IOException {
@@ -464,7 +471,7 @@ public class MultiAddressBookTest {
 		path = def.toPath();
 		BufferedReader reader = Files.newBufferedReader(path, Charset.defaultCharset());
 		String line1 = reader.readLine();
-		assertEquals("name=John Smith,phoneNumber=0414123456", line1);
+		assertEquals("id=0,name=John Smith,phoneNumber=0414123456", line1);
 		String line2 = reader.readLine();
 		assertNull(line2);
 		return def;
@@ -499,7 +506,7 @@ public class MultiAddressBookTest {
 		path = abc.toPath();
 		BufferedReader reader = Files.newBufferedReader(path, Charset.defaultCharset());
 		String line1 = reader.readLine();
-		assertEquals("name=John Smith,phoneNumber=0414123456", line1);
+		assertEquals("id=0,name=John Smith,phoneNumber=0414123456", line1);
 		String line2 = reader.readLine();
 		assertNull(line2);
 		return abc;

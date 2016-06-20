@@ -21,6 +21,8 @@ import au.com.reece.addressbook.utils.StringUtils;
  */
 public class FileContactDAO implements ContactDAO {
 
+	private static final int TWO = 2;
+
 	private static final int ONE = 1;
 
 	private static final int ZERO = 0;
@@ -136,12 +138,20 @@ public class FileContactDAO implements ContactDAO {
 	protected void doContactConversion(List<Contact> contacts, List<String> contents) {
 		for (String content : contents) {
 			String[] strings = content.split(FIELD_SEPARATOR);
-			String name = strings[ZERO].trim();
-			String phoneNumber = strings[ONE].trim(); 
-			name = name.replace(NAME_TAG, EMPTY); 
-			phoneNumber = phoneNumber.replace(PHONE_NUMBER_TAG, EMPTY); 
-			Contact contact = new Contact(name, phoneNumber);
-			contacts.add(contact);
+			String idString = strings[ZERO].trim();
+			String name = strings[ONE].trim();
+			String phoneNumber = strings[TWO].trim();
+			idString = idString.replace("id=", EMPTY);
+			try {
+				long id = Long.parseLong(idString);
+				name = name.replace(NAME_TAG, EMPTY); 
+				phoneNumber = phoneNumber.replace(PHONE_NUMBER_TAG, EMPTY); 
+				Contact contact = new Contact(id, name, phoneNumber);
+				contacts.add(contact);
+			}
+			catch(NumberFormatException e) {
+				//Invalid ID! Ignore this contact.
+			}
 		}
 	}
 
@@ -224,5 +234,56 @@ public class FileContactDAO implements ContactDAO {
 			}
 		}
 		return undeleted;
+	}
+
+	public boolean update(Contact updatedContact) {
+		boolean success = false;
+		boolean updated = false;
+		try {
+			String tempFileName = fileName + System.currentTimeMillis();
+			File tempFile = new File(tempFileName); 
+			BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis, CHAR_SET_UTF_8));
+			
+			String lineToUpdate = updatedContact.toString();
+			String idString = "id=" + updatedContact.getId();
+			String currentLine;
+			while(null != (currentLine = bufferedReader.readLine())) {
+				String trimmedLine = currentLine.trim();
+				if (trimmedLine.startsWith(idString)) {
+					currentLine = lineToUpdate;
+					updated = true;
+				}
+				writer.write(currentLine + LINE_SEPARATOR);
+			}
+			
+			//Insert into the end of file.
+			if (!updated) {
+				writer.write(lineToUpdate + LINE_SEPARATOR);
+			}
+			
+			//Done! Clean up resource. 
+			writer.flush();
+			writer.close();
+			bufferedReader.close();
+			fis.close();
+			
+			// Replace the old file with temp file.
+			success = file.delete();
+			if (success) {
+				success = tempFile.renameTo(file);
+			}
+			// Points the file and inputStream to
+			// the new file.
+			if (success) {
+				file = new File(fileName);
+				fis = new FileInputStream(file);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			success = false;
+		}
+		return success;
 	}
 }
