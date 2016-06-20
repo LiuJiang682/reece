@@ -21,6 +21,8 @@ import au.com.reece.addressbook.utils.StringUtils;
  */
 public class FileContactDAO implements ContactDAO {
 
+	private static final String ID_TAG = "id=";
+
 	private static final int TWO = 2;
 
 	private static final int ONE = 1;
@@ -141,7 +143,7 @@ public class FileContactDAO implements ContactDAO {
 			String idString = strings[ZERO].trim();
 			String name = strings[ONE].trim();
 			String phoneNumber = strings[TWO].trim();
-			idString = idString.replace("id=", EMPTY);
+			idString = idString.replace(ID_TAG, EMPTY);
 			try {
 				long id = Long.parseLong(idString);
 				name = name.replace(NAME_TAG, EMPTY); 
@@ -246,7 +248,7 @@ public class FileContactDAO implements ContactDAO {
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis, CHAR_SET_UTF_8));
 			
 			String lineToUpdate = updatedContact.toString();
-			String idString = "id=" + updatedContact.getId();
+			String idString = ID_TAG + updatedContact.getId();
 			String currentLine;
 			while(null != (currentLine = bufferedReader.readLine())) {
 				String trimmedLine = currentLine.trim();
